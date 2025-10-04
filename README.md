@@ -3,8 +3,6 @@
 ## Overview
 The Early Skin Disease Detection System is a web-based tool that provides clinical assessment for early skin disorder detection. The system analyzes skin lesion characteristics using both clinical criteria and machine learning to provide risk assessments and recommendations.
 
-![Skin Disease Detection System](https://github.com/Megha-Chakraborty/Skin-Disease-Detector/raw/main/static/images/screenshot.png)
-
 ## Features
 - **Clinical Assessment**: Analyzes skin lesions using ABCDE criteria (Asymmetry, Border irregularity, Color variation, Diameter, Evolution)
 - **Risk Evaluation**: Categorizes skin lesions into Low, Medium, or High risk levels
@@ -126,4 +124,4 @@ Risk is calculated based on the presence and severity of each criterion. The sys
 - Bootstrap for responsive UI design
 
 ## Contact
-For questions or support, please contact [mailto:ch.megha0401@gmail.com]
+For questions or support, please contact [ch.megha0401@gmail.com](mailto:ch.megha0401@gmail.com)
