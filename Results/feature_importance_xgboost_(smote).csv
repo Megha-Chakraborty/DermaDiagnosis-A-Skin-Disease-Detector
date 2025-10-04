@@ -1,0 +1,16 @@
+Feature,Importance
+is_high_risk,681.6609497070312
+diagnosis_confidence_scaled,173.1697235107422
+lesion_count,15.415390968322754
+localization_lower extremity,14.432662963867188
+body_region_head_neck,14.276896476745605
+diagnosis_confidence_minmax,13.409552574157715
+localization_face,13.249643325805664
+age_scaled,13.13934326171875
+is_male,10.47504997253418
+age_normalized,9.633918762207031
+lesion_count_scaled,9.259973526000977
+sex_female,9.047599792480469
+sex_male,7.249358177185059
+lesion_count_minmax,5.456428050994873
+age,5.177762031555176

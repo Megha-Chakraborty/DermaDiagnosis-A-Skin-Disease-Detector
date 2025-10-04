@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disorder Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            color: #343a40;
+        }
+        .jumbotron {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+            transition: transform 0.3s ease;
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .skin-card {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            color: white;
+        }
+        .metric-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #5e72e4;
+        }
+        .metric-title {
+            font-size: 0.9rem;
+            color: #8898aa;
+            text-transform: uppercase;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #5e72e4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">DermaDiagnosis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predict">Predict</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <!-- Hero Section -->
+        <div class="jumbotron text-center p-5 mb-4" style="background-color: #f8d7da; border-radius: 0.5rem;">
+            <h1 class="display-4 text-dark">Early Skin Disease Detection System</h1>
+            <p class="lead text-dark">Advanced clinical assessment for early skin disorder detection</p>
+            <hr class="my-4">
+            <p class="text-dark">Our assessment system analyzes skin lesion characteristics to identify potential skin disorders with clinical accuracy.</p>
+            <a class="btn btn-primary btn-lg" href="/predict" role="button">Try Assessment</a>
+        </div>
+        
+        <!-- Key Metrics -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">Model Performance</h2>
+            </div>
+            {% if model_metrics %}
+            <div class="col-md-2">
+                <div class="metric-card text-center">
+                    <div class="metric-value">{{ "%.1f"|format(model_metrics.accuracy*100) }}%</div>
+                    <div class="metric-title">Accuracy</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card text-center">
+                    <div class="metric-value">{{ "%.1f"|format(model_metrics.precision*100) }}%</div>
+                    <div class="metric-title">Precision</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card text-center">
+                    <div class="metric-value">{{ "%.1f"|format(model_metrics.recall*100) }}%</div>
+                    <div class="metric-title">Recall</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card text-center">
+                    <div class="metric-value">{{ "%.1f"|format(model_metrics.f1_score*100) }}%</div>
+                    <div class="metric-title">F1 Score</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card text-center">
+                    <div class="metric-value">{{ "%.3f"|format(model_metrics.auc_roc) }}</div>
+                    <div class="metric-title">AUC-ROC</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-warning">Model metrics not available</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Features Section -->
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <h2>Key Features for Detection</h2>
+                <p class="lead">Our model analyzes these critical characteristics:</p>
+                
+                {% if top_features %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Importance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for feature in top_features %}
+                        <tr>
+                            <td>{{ feature.Feature }}</td>
+                            <td>{{ "%.4f"|format(feature.Importance) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>Feature importance data not available.</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h2>Risk Assessment</h2>
+                <div class="card mb-3">
+                    <div class="card-header bg-danger text-white">High Risk</div>
+                    <div class="card-body">
+                        <p>{{ risk_descriptions["High Risk"] }}</p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark">Medium Risk</div>
+                    <div class="card-body">
+                        <p>{{ risk_descriptions["Medium Risk"] }}</p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">Low Risk</div>
+                    <div class="card-body">
+                        <p>{{ risk_descriptions["Low Risk"] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- About Section -->
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">About this Project</h2>
+                <div class="card skin-card">
+                    <div class="card-body">
+                        <p>This project uses machine learning to predict skin disorders, with a focus on melanoma detection. 
+                           The model was trained on the HAM10000 dataset and applies feature engineering techniques to improve accuracy.</p>
+                        <p>Features analyzed include demographic information, lesion characteristics, and medical history to provide a comprehensive assessment.</p>
+                        <a href="/dashboard" class="btn btn-custom">View Detailed Results</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">© 2025 Early Skin Disease Detection System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
