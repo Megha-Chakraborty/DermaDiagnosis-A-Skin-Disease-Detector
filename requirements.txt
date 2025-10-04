@@ -1,1 +1,10 @@
 # Required libraries
+flask
+numpy
+pandas
+Pillow
+scikit-learn
+matplotlib
+seaborn
+xgboost
+gunicorn
