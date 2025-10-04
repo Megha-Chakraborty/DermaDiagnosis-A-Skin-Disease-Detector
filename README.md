@@ -126,4 +126,4 @@ Risk is calculated based on the presence and severity of each criterion. The sys
 - Bootstrap for responsive UI design
 
 ## Contact
-For questions or support, please contact [your-email@example.com](mailto:ch.megha0401@gmail.com)
+For questions or support, please contact [mailto:ch.megha0401@gmail.com]
