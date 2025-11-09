@@ -46,14 +46,45 @@
             font-weight: 600;
             background-color: #f8f9fa;
         }
+        .nav-tabs .nav-link {
+            font-weight: 600;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #f8f9fa;
+            border-bottom-color: #f8f9fa;
+        }
+        .upload-box {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-box:hover {
+            border-color: #adb5bd;
+            background-color: #f8f9fa;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 1rem auto;
+            display: block;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .upload-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">DermaDiagnosis
-</a>
+            <a class="navbar-brand" href="/">Skin Lesion Analysis Tool</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -77,7 +108,7 @@
     <div class="container py-5">
         <div class="row">
             <div class="col-md-10 mx-auto">
-                <h1 class="text-center mb-4">Melanoma Detection</h1>
+                <h1 class="text-center mb-4">Skin Lesion Analysis</h1>
                 
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -90,166 +121,342 @@
                 {% endwith %}
                 
                 <div class="prediction-container">
-                    <p class="lead text-center mb-4">Enter Your Skin Lesion Characteristics</p>
+                    <p class="lead text-center mb-4">Analyze Your Skin Lesion</p>
                     
                     <div class="text-center mb-4">
-                        <p>Please answer the following questions about your skin lesion to help our AI predict the likelihood of melanoma.</p>
-                        <p class="text-muted">If you're unsure about any question, make your best estimate.</p>
+                        <p>Choose how you want to provide information about your skin lesion:</p>
                     </div>
                     
-                    <form action="/predict" method="post">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                Basic Information
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <label class="form-label">Age</label>
-                                        <input type="number" name="age" class="form-control" min="0" max="120" required>
-                                        <div class="form-text">Your age in years</div>
+                    <!-- Tabs for selection between manual input and image upload -->
+                    <ul class="nav nav-tabs mb-4" id="inputMethod" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab">
+                                Manual Entry
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image" type="button" role="tab">
+                                Upload Image
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="inputMethodContent">
+                        <!-- Manual Entry Tab -->
+                        <div class="tab-pane fade show active" id="manual" role="tabpanel">
+                            <form action="/predict" method="post" id="manualForm">
+                                <input type="hidden" name="input_type" value="manual">
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        Basic Information
                                     </div>
-                                    <div class="col-md-6 form-group">
-                                        <label class="form-label">Gender</label>
-                                        <select name="sex" class="form-select" required>
-                                            <option value="">Select gender</option>
-                                            <option value="0">Female</option>
-                                            <option value="1">Male</option>
-                                        </select>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Age</label>
+                                                <input type="number" name="age" class="form-control" min="0" max="120" required>
+                                                <div class="form-text">Your age in years</div>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Gender</label>
+                                                <select name="sex" class="form-select" required>
+                                                    <option value="">Select gender</option>
+                                                    <option value="0">Female</option>
+                                                    <option value="1">Male</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Location on Body</label>
+                                                <select name="localization" class="form-select" required>
+                                                    <option value="">Select location</option>
+                                                    <option value="0">Abdomen</option>
+                                                    <option value="1">Back</option>
+                                                    <option value="2">Chest</option>
+                                                    <option value="3">Ear</option>
+                                                    <option value="4">Face</option>
+                                                    <option value="5">Foot</option>
+                                                    <option value="6">Hand</option>
+                                                    <option value="7">Lower extremity</option>
+                                                    <option value="8">Neck</option>
+                                                    <option value="9">Scalp</option>
+                                                    <option value="10">Trunk</option>
+                                                    <option value="11">Upper extremity</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Lesion Diameter (mm)</label>
+                                                <input type="number" name="diameter_mm" class="form-control" min="0" max="100" step="0.1" required>
+                                                <div class="form-text">Approximate diameter of the lesion in millimeters</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <label class="form-label">Location on Body</label>
-                                        <select name="localization" class="form-select" required>
-                                            <option value="">Select location</option>
-                                            <option value="0">Abdomen</option>
-                                            <option value="1">Back</option>
-                                            <option value="2">Chest</option>
-                                            <option value="3">Ear</option>
-                                            <option value="4">Face</option>
-                                            <option value="5">Foot</option>
-                                            <option value="6">Hand</option>
-                                            <option value="7">Lower extremity</option>
-                                            <option value="8">Neck</option>
-                                            <option value="9">Scalp</option>
-                                            <option value="10">Trunk</option>
-                                            <option value="11">Upper extremity</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 form-group">
-                                        <label class="form-label">Lesion Diameter (mm)</label>
-                                        <input type="number" name="diameter_mm" class="form-control" min="0" max="100" step="0.1" required>
-                                        <div class="form-text">Approximate diameter of the lesion in millimeters</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                ABCDE Criteria
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label class="form-label">Asymmetry</label>
-                                    <div class="form-text mb-2">Is the shape asymmetrical? (One half unlike the other)</div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="asymmetry" id="asymmetry_0" value="0" required>
-                                        <label class="form-check-label" for="asymmetry_0">No</label>
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        ABCDE Criteria
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="asymmetry" id="asymmetry_1" value="1">
-                                        <label class="form-check-label" for="asymmetry_1">Yes</label>
+                                    <div class="card-body">
+                                        <!-- Same ABCDE criteria as before -->
+                                        <div class="form-group">
+                                            <label class="form-label">Asymmetry</label>
+                                            <div class="form-text mb-2">Is the shape asymmetrical? (One half unlike the other)</div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="asymmetry" id="asymmetry_0" value="0" required>
+                                                <label class="form-check-label" for="asymmetry_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="asymmetry" id="asymmetry_1" value="1">
+                                                <label class="form-check-label" for="asymmetry_1">Yes</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Rest of the ABCDE criteria -->
+                                        <div class="form-group">
+                                            <label class="form-label">Border Irregularity</label>
+                                            <div class="form-text mb-2">Are the borders irregular, notched, or blurred?</div>
+                                            <select name="border_irregularity" class="form-select" required>
+                                                <option value="">Select border irregularity</option>
+                                                <option value="0">Regular borders</option>
+                                                <option value="1">Slightly irregular</option>
+                                                <option value="2">Moderately irregular</option>
+                                                <option value="3">Very irregular</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Color Variation</label>
+                                            <div class="form-text mb-2">Are there multiple colors in the lesion? (brown, black, red, blue, white)</div>
+                                            <select name="color_variation" class="form-select" required>
+                                                <option value="">Select color variation</option>
+                                                <option value="0">Single color</option>
+                                                <option value="1">Two colors</option>
+                                                <option value="2">Three colors</option>
+                                                <option value="3">More than three colors</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Evolution</label>
+                                            <div class="form-text mb-2">Has the lesion changed in size, shape, or color over time?</div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="evolution" id="evolution_0" value="0" required>
+                                                <label class="form-check-label" for="evolution_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="evolution" id="evolution_1" value="1">
+                                                <label class="form-check-label" for="evolution_1">Yes</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Border Irregularity</label>
-                                    <div class="form-text mb-2">Are the borders irregular, notched, or blurred?</div>
-                                    <select name="border_irregularity" class="form-select" required>
-                                        <option value="">Select border irregularity</option>
-                                        <option value="0">Regular borders</option>
-                                        <option value="1">Slightly irregular</option>
-                                        <option value="2">Moderately irregular</option>
-                                        <option value="3">Very irregular</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Color Variation</label>
-                                    <div class="form-text mb-2">Are there multiple colors in the lesion? (brown, black, red, blue, white)</div>
-                                    <select name="color_variation" class="form-select" required>
-                                        <option value="">Select color variation</option>
-                                        <option value="0">Single color</option>
-                                        <option value="1">Two colors</option>
-                                        <option value="2">Three colors</option>
-                                        <option value="3">More than three colors</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group mb-0">
-                                    <label class="form-label">Evolution</label>
-                                    <div class="form-text mb-2">Has the lesion changed in size, shape, or color over time?</div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="evolution" id="evolution_0" value="0" required>
-                                        <label class="form-check-label" for="evolution_0">No</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="evolution" id="evolution_1" value="1">
-                                        <label class="form-check-label" for="evolution_1">Yes</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                Additional Symptoms
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label class="form-label">Itchiness</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="itchiness" id="itchiness_0" value="0" required>
-                                        <label class="form-check-label" for="itchiness_0">No</label>
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        Additional Symptoms
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="itchiness" id="itchiness_1" value="1">
-                                        <label class="form-check-label" for="itchiness_1">Yes</label>
+                                    <div class="card-body">
+                                        <!-- Additional symptoms section remains the same -->
+                                        <div class="form-group">
+                                            <label class="form-label">Itchiness</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="itchiness" id="itchiness_0" value="0" required>
+                                                <label class="form-check-label" for="itchiness_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="itchiness" id="itchiness_1" value="1">
+                                                <label class="form-check-label" for="itchiness_1">Yes</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Bleeding or Oozing</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bleeding" id="bleeding_0" value="0" required>
+                                                <label class="form-check-label" for="bleeding_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bleeding" id="bleeding_1" value="1">
+                                                <label class="form-check-label" for="bleeding_1">Yes</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Pain or Tenderness</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="pain" id="pain_0" value="0" required>
+                                                <label class="form-check-label" for="pain_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="pain" id="pain_1" value="1">
+                                                <label class="form-check-label" for="pain_1">Yes</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label class="form-label">Bleeding or Oozing</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="bleeding" id="bleeding_0" value="0" required>
-                                        <label class="form-check-label" for="bleeding_0">No</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="bleeding" id="bleeding_1" value="1">
-                                        <label class="form-check-label" for="bleeding_1">Yes</label>
-                                    </div>
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-custom btn-lg">Analyze Symptoms</button>
                                 </div>
-                                
-                                <div class="form-group mb-0">
-                                    <label class="form-label">Pain or Tenderness</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="pain" id="pain_0" value="0" required>
-                                        <label class="form-check-label" for="pain_0">No</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="pain" id="pain_1" value="1">
-                                        <label class="form-check-label" for="pain_1">Yes</label>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                         
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-custom btn-lg">Analyze Symptoms</button>
+                        <!-- Image Upload Tab -->
+                        <div class="tab-pane fade" id="image" role="tabpanel">
+                            <form action="/predict" method="post" enctype="multipart/form-data" id="imageForm">
+                                <input type="hidden" name="input_type" value="image">
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        Upload Skin Lesion Image
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-3">Upload a clear, well-lit image of your skin lesion. This will help us analyze its characteristics.</p>
+                                        
+                                        <div class="upload-box" id="dropArea">
+                                            <div class="upload-icon">📷</div>
+                                            <p class="mb-3">Drag and drop an image here, or click to browse</p>
+                                            <input type="file" id="imageInput" name="lesion_image" accept="image/*" class="d-none" required>
+                                            <button type="button" class="btn btn-outline-primary" id="browseButton">Browse Files</button>
+                                        </div>
+                                        
+                                        <div id="previewContainer" class="mt-3 d-none">
+                                            <img id="imagePreview" class="image-preview">
+                                            <div class="d-flex justify-content-center mt-2">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" id="removeImage">Remove Image</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="alert alert-info mt-3">
+                                            <h5>Tips for a good image:</h5>
+                                            <ul class="mb-0">
+                                                <li>Use good lighting</li>
+                                                <li>Keep the lesion centered</li>
+                                                <li>Include a ruler or coin for size reference if possible</li>
+                                                <li>Avoid flash that might wash out colors</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        Basic Information (Required)
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Age</label>
+                                                <input type="number" name="age" class="form-control" min="0" max="120" required>
+                                                <div class="form-text">Your age in years</div>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label class="form-label">Gender</label>
+                                                <select name="sex" class="form-select" required>
+                                                    <option value="">Select gender</option>
+                                                    <option value="0">Female</option>
+                                                    <option value="1">Male</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 form-group mb-0">
+                                                <label class="form-label">Location on Body</label>
+                                                <select name="localization" class="form-select" required>
+                                                    <option value="">Select location</option>
+                                                    <option value="0">Abdomen</option>
+                                                    <option value="1">Back</option>
+                                                    <option value="2">Chest</option>
+                                                    <option value="3">Ear</option>
+                                                    <option value="4">Face</option>
+                                                    <option value="5">Foot</option>
+                                                    <option value="6">Hand</option>
+                                                    <option value="7">Lower extremity</option>
+                                                    <option value="8">Neck</option>
+                                                    <option value="9">Scalp</option>
+                                                    <option value="10">Trunk</option>
+                                                    <option value="11">Upper extremity</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 form-group mb-0">
+                                                <label class="form-label">Has the lesion changed over time?</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="evolution" id="evolution_img_0" value="0" required>
+                                                    <label class="form-check-label" for="evolution_img_0">No</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="evolution" id="evolution_img_1" value="1">
+                                                    <label class="form-check-label" for="evolution_img_1">Yes</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        Additional Symptoms (Optional)
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label class="form-label">Itchiness</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="itchiness" id="itchiness_img_0" value="0">
+                                                <label class="form-check-label" for="itchiness_img_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="itchiness" id="itchiness_img_1" value="1">
+                                                <label class="form-check-label" for="itchiness_img_1">Yes</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="itchiness" id="itchiness_img_unknown" value="" checked>
+                                                <label class="form-check-label" for="itchiness_img_unknown">Unknown</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Bleeding or Oozing</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bleeding" id="bleeding_img_0" value="0">
+                                                <label class="form-check-label" for="bleeding_img_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bleeding" id="bleeding_img_1" value="1">
+                                                <label class="form-check-label" for="bleeding_img_1">Yes</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bleeding" id="bleeding_img_unknown" value="" checked>
+                                                <label class="form-check-label" for="bleeding_img_unknown">Unknown</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Pain or Tenderness</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="pain" id="pain_img_0" value="0">
+                                                <label class="form-check-label" for="pain_img_0">No</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="pain" id="pain_img_1" value="1">
+                                                <label class="form-check-label" for="pain_img_1">Yes</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="pain" id="pain_img_unknown" value="" checked>
+                                                <label class="form-check-label" for="pain_img_unknown">Unknown</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-custom btn-lg" id="analyzeButton" disabled>Analyze Image</button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -258,10 +465,102 @@
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
-            <p class="mb-0">© 2025 Early Skin Disease Detection System</p>
+            <p class="mb-0">© 2025 Skin Lesion Analysis System</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Image upload functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('imageInput');
+            const dropArea = document.getElementById('dropArea');
+            const previewContainer = document.getElementById('previewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeButton = document.getElementById('removeImage');
+            const browseButton = document.getElementById('browseButton');
+            const analyzeButton = document.getElementById('analyzeButton');
+            
+            // Browse button click handler
+            browseButton.addEventListener('click', function() {
+                imageInput.click();
+            });
+            
+            // File input change handler
+            imageInput.addEventListener('change', function() {
+                handleFileUpload(this.files);
+            });
+            
+            // Drag and drop handlers
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('bg-light');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('bg-light');
+            }
+            
+            // Handle dropped files
+            dropArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFileUpload(files);
+            });
+            
+            // Remove image button handler
+            removeButton.addEventListener('click', function() {
+                imageInput.value = '';
+                previewContainer.classList.add('d-none');
+                dropArea.classList.remove('d-none');
+                analyzeButton.disabled = true;
+            });
+            
+            // Handle file upload
+            function handleFileUpload(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    
+                    // Check if file is an image
+                    if (!file.type.match('image.*')) {
+                        alert('Please upload an image file (JPEG, PNG, etc.)');
+                        return;
+                    }
+                    
+                    // Check file size (limit to 10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File is too large. Please upload an image smaller than 10MB.');
+                        return;
+                    }
+                    
+                    // Create preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        previewContainer.classList.remove('d-none');
+                        dropArea.classList.add('d-none');
+                        analyzeButton.disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

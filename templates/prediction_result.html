@@ -240,6 +240,14 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Add this in your prediction_result.html where appropriate -->
+                    {% if results.image_path %}
+                        <div class="text-center mb-4">
+                            <h4>Analyzed Image</h4>
+                            <img src="{{ url_for('static', filename=results.image_path) }}" class="img-fluid rounded" style="max-height: 300px;">
+                        </div>
+                    {% endif %}
+                    
                     <div class="d-flex justify-content-between mt-4">
                         <a href="/predict" class="btn btn-secondary">Make Another Prediction</a>
                         <a href="/" class="btn btn-custom">Return to Home</a>
