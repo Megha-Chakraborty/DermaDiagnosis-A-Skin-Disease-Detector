@@ -167,50 +167,72 @@ def index():
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
+    def get_int(name, default=0):
+        v = request.form.get(name)
+        if not v:
+            return default
+        try:
+            return int(v)
+        except Exception:
+            try:
+                return int(float(v))
+            except Exception:
+                return default
+
+    def get_float(name, default=0.0):
+        v = request.form.get(name)
+        if not v:
+            return default
+        try:
+            return float(v)
+        except Exception:
+            return default
+
     if request.method == 'POST':
         try:
-            # Get form data
+            # If there's an uploaded image, save it (optional)
+            file = request.files.get('lesion_image')
+            if file and file.filename:
+                upload_folder = app.config.get('UPLOAD_FOLDER') or os.path.join(script_dir, 'uploads')
+                os.makedirs(upload_folder, exist_ok=True)
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(upload_folder, filename)
+                file.save(file_path)
+                print(f"Saved image to {file_path}")
+
+            # Build features dict using safe parsers
             features = {}
-            
-            # Basic information
-            features['age'] = float(request.form.get('age', 0))
-            features['sex'] = int(request.form.get('sex', 0))
-            features['localization'] = int(request.form.get('localization', 0))
-            features['diameter_mm'] = float(request.form.get('diameter_mm', 0))
-            
-            # ABCDE criteria
-            features['asymmetry'] = int(request.form.get('asymmetry', 0))
-            features['border_irregularity'] = int(request.form.get('border_irregularity', 0))
-            features['color_variation'] = int(request.form.get('color_variation', 0))
-            features['evolution'] = int(request.form.get('evolution', 0))
-            
-            # Additional symptoms
-            features['itchiness'] = int(request.form.get('itchiness', 0))
-            features['bleeding'] = int(request.form.get('bleeding', 0))
-            features['pain'] = int(request.form.get('pain', 0))
-            
-            # Add any remaining features your model expects
-            # For any missing features, use defaults (like 0)
+            features['age'] = get_float('age', 0)
+            features['sex'] = get_int('sex', 0)
+            features['localization'] = get_int('localization', 0)
+            features['diameter_mm'] = get_float('diameter_mm', 0)
+            features['asymmetry'] = get_int('asymmetry', 0)
+            features['border_irregularity'] = get_int('border_irregularity', 0)
+            features['color_variation'] = get_int('color_variation', 0)
+            features['evolution'] = get_int('evolution', 0)
+            features['itchiness'] = get_int('itchiness', 0)
+            features['bleeding'] = get_int('bleeding', 0)
+            features['pain'] = get_int('pain', 0)
+
+            # Fill missing expected columns with defaults
             for col in feature_columns:
                 if col not in features:
                     features[col] = 0
-            
-            # Create DataFrame for prediction
+
             input_df = pd.DataFrame([features])
-            
-            # Make prediction
             results = predict_melanoma(input_df)
-            
+
             if "error" in results:
                 flash(f"Error: {results['error']}", 'danger')
                 return redirect(url_for('predict'))
-                
+
             return render_template('prediction_result.html', results=results, features=features)
-            
+
         except Exception as e:
+            print("Predict exception:", e)
             flash(f"Error: {str(e)}", 'danger')
             return redirect(url_for('predict'))
-    
+
     # GET request - show prediction form
     return render_template('prediction_form.html')
 

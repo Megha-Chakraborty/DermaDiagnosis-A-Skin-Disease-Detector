@@ -93,6 +93,17 @@
 
     <!-- Main Content -->
     <div class="container py-5">
+        <!-- flash messages (safe even if none) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mt-3">
+              {% for category, msg in messages %}
+                <div class="alert alert-{{ 'success' if category=='success' else 'danger' if category=='danger' else 'info' }}">{{ msg }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
         <!-- Hero Section -->
         <div class="jumbotron text-center p-5 mb-4" style="background-color: #f8d7da; border-radius: 0.5rem;">
             <h1 class="display-4 text-dark">Early Skin Disease Detection System</h1>
@@ -174,22 +185,30 @@
             </div>
             <div class="col-md-6">
                 <h2>Risk Assessment</h2>
+
+                {# ensure risk_descriptions exists; provide safe defaults if not #}
+                {% set rd = risk_descriptions if risk_descriptions is defined else {
+                    'High Risk':'High risk description not available.',
+                    'Medium Risk':'Medium risk description not available.',
+                    'Low Risk':'Low risk description not available.'
+                } %}
+
                 <div class="card mb-3">
                     <div class="card-header bg-danger text-white">High Risk</div>
                     <div class="card-body">
-                        <p>{{ risk_descriptions["High Risk"] }}</p>
+                        <p>{{ rd["High Risk"] }}</p>
                     </div>
                 </div>
                 <div class="card mb-3">
                     <div class="card-header bg-warning text-dark">Medium Risk</div>
                     <div class="card-body">
-                        <p>{{ risk_descriptions["Medium Risk"] }}</p>
+                        <p>{{ rd["Medium Risk"] }}</p>
                     </div>
                 </div>
                 <div class="card mb-3">
                     <div class="card-header bg-success text-white">Low Risk</div>
                     <div class="card-body">
-                        <p>{{ risk_descriptions["Low Risk"] }}</p>
+                        <p>{{ rd["Low Risk"] }}</p>
                     </div>
                 </div>
             </div>
@@ -206,6 +225,17 @@
                         <p>Features analyzed include demographic information, lesion characteristics, and medical history to provide a comprehensive assessment.</p>
                         <a href="/dashboard" class="btn btn-custom">View Detailed Results</a>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Form Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card skin-card p-4">
+                    <h5>Assessment</h5>
+                    <p>Take assessment to get the prediction.</p>
+                    <a class="btn btn-custom" href="{{ url_for('predict') }}">Go to Predict</a>
                 </div>
             </div>
         </div>
