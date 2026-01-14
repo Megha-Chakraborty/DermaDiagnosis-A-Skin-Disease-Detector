@@ -6,45 +6,93 @@
     <title>Make a Prediction - Skin Disorder Prediction</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --charcoal: #36454F;
+            --bright-aqua: #00CED1;
+            --sandy-beige: #F4E4C1;
+            --text-dark: #2C2C2C;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #f8f9fa, #e9ecef);
-            color: #343a40;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #1a2830;
+            background-image: linear-gradient(135deg, #1a2830 0%, #243642 50%, #1a2830 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
         }
         .prediction-container {
             background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(54,69,79,0.15);
+            padding: 3rem;
             margin-top: 2rem;
+            border: 2px solid rgba(0,206,209,0.2);
+            position: relative;
+        }
+        .prediction-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--bright-aqua) 0%, var(--charcoal) 100%);
+            border-radius: 20px 20px 0 0;
         }
         .btn-custom {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--bright-aqua) 0%, #009B9E 100%);
             border: none;
             color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 20px rgba(0,206,209,0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .btn-custom:hover {
-            background: linear-gradient(135deg, #764ba2, #667eea);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #009B9E 0%, var(--charcoal) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,206,209,0.5);
             color: white;
+        }
+        .btn-custom:disabled {
+            background: linear-gradient(135deg, rgba(0,206,209,0.5) 0%, rgba(0,155,158,0.5) 100%);
+            color: white;
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         .form-label {
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: var(--charcoal);
+            font-size: 0.95rem;
+        }
+        .form-control {
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: var(--bright-aqua);
+            box-shadow: 0 0 0 4px rgba(0,206,209,0.15);
         }
         .form-text {
             margin-bottom: 1rem;
+            color: #666;
+            font-weight: 500;
         }
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
         .card-header {
             font-weight: 600;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, var(--charcoal), var(--bright-aqua));
+            color: white;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.25rem;
         }
         .nav-tabs .nav-link {
             font-weight: 600;
@@ -82,9 +130,9 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #004D40;">
         <div class="container">
-            <a class="navbar-brand" href="/">Skin Lesion Analysis Tool</a>
+            <a class="navbar-brand" href="/">Skin Lesion Analysis</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -121,7 +169,7 @@
                 {% endwith %}
                 
                 <div class="prediction-container">
-                    <p class="lead text-center mb-4">Analyze Your Skin Lesion</p>
+                    <p class="lead text-center mb-4" style="color: #2C2C2C; font-weight: 500;">Analyze Your Skin Lesion</p>
                     
                     <div class="text-center mb-4">
                         <p>Choose how you want to provide information about your skin lesion:</p>
