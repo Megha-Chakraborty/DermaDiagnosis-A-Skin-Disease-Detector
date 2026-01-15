@@ -15,11 +15,13 @@
         }
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-            background: #1a2830;
-            background-image: linear-gradient(135deg, #1a2830 0%, #243642 50%, #1a2830 100%);
+            background: linear-gradient(135deg, #2B3A42 0%, #1F2D35 100%);
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(0,206,209,0.08) 35px, rgba(0,206,209,0.08) 70px),
+                repeating-linear-gradient(60deg, transparent, transparent 35px, rgba(244,228,193,0.06) 35px, rgba(244,228,193,0.06) 70px),
+                repeating-linear-gradient(120deg, transparent, transparent 35px, rgba(255,228,196,0.05) 35px, rgba(255,228,196,0.05) 70px);
             color: var(--text-dark);
             padding-bottom: 2rem;
-            min-height: 100vh;
         }
         .dashboard-container {
             background-color: white;
